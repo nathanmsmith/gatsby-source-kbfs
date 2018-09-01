@@ -1,0 +1,9 @@
+{
+  "name": "gatsby-source-kbfs",
+  "version": "0.1.0",
+  "description": "Gatsby source for the Keybase Filesystem",
+  "main": "index.js",
+  "repository": "git@github.com:thebearjew/gatsby-source-kbfs.git",
+  "author": "Jacob Young <jacob@jry.io>",
+  "license": "MIT"
+}

@@ -5,5 +5,18 @@
   "main": "index.js",
   "repository": "git@github.com:thebearjew/gatsby-source-kbfs.git",
   "author": "Jacob Young <jacob@jry.io>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "build": "$(yarn bin)/babel src --out-file index.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "node-fetch": "^2.2.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "prettier": "^1.14.2"
+  }
 }

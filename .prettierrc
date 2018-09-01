@@ -1,0 +1,13 @@
+bracketSpacing: false
+printWidth: 110
+semi: false
+singleQuote: true
+tabWidth: 2
+trailingComma: es5
+overrides:
+  - files: .prettierrc
+    options:
+      parser: json
+  - files: "*.json"
+    options:
+      printWidth: 100

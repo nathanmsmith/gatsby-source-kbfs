@@ -1,3 +1,7 @@
+# Custom for gatsby-source-kbfs
+/index.js
+
+
 # Logs
 logs
 *.log

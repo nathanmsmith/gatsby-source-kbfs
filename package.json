@@ -1,16 +1,23 @@
 {
   "name": "gatsby-source-kbfs",
+  "author": "Jacob Young <jacob@jry.io> (https://jry.io)",
   "version": "0.1.0",
-  "description": "Gatsby source for the Keybase Filesystem",
+  "description": "Gatsby source for the Keybase File System",
+  "keywords": [
+    "gatsby",
+    "gatsby-plugin",
+    "gatsby-source-kbfs",
+    "keybase",
+    "kbfs"
+  ],
   "main": "index.js",
-  "repository": "git@github.com:thebearjew/gatsby-source-kbfs.git",
-  "author": "Jacob Young <jacob@jry.io>",
-  "license": "MIT",
   "scripts": {
-    "build": "$(yarn bin)/babel src --out-file index.js"
+    "build": "yarn run babel lib --out-dir .",
+    "prepublish": "yarn run build"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
+    "lodash": "^4.17.10",
     "node-fetch": "^2.2.0"
   },
   "devDependencies": {
@@ -18,5 +25,7 @@
     "@babel/core": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "prettier": "^1.14.2"
-  }
+  },
+  "repository": "git@github.com:thebearjew/gatsby-source-kbfs.git",
+  "license": "MIT"
 }

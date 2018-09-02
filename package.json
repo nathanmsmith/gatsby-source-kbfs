@@ -12,7 +12,7 @@
   ],
   "main": "index.js",
   "scripts": {
-    "build": "yarn run babel lib --out-dir .",
+    "build": "yarn run babel src --out-dir .",
     "prepublish": "yarn run build"
   },
   "dependencies": {

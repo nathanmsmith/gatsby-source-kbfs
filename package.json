@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
+    "gatsby-source-filesystem": "^1.5.39",
     "lodash": "^4.17.10",
     "node-fetch": "^2.2.0"
   },

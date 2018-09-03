@@ -30,17 +30,24 @@ const makeRemoteFileNode = async ({file, store, cache, createNode}) => {
   }
 }
 
-const makeKBFSFile = ({res, fileNode, username, folder, file, content}) => ({
-  id: `kbfs-${username}-${kebabCase(url.parse(file).pathname)}`,
-  children: [],
-  absolutePath: fileNode.absolutePath,
-  parent: fileNode.id,
-  internal: {
-    type: 'KbfsFile',
-    mediaType: res.headers.get('content-type'),
-    contentDigest: makeContentDigest(content),
-  },
-})
+const makeKBFSFile = ({res, fileNode, username, folder, file, content}) => {
+  const {pathname} = url.parse(file)
+  const {base} = path.parse(pathname)
+  const folderKebab = kebabCase(pathname)
+  return {
+    id: `kbfs-${username}-${folderKebab}`,
+    children: [],
+    parent: fileNode.id,
+    absolutePath: fileNode.absolutePath,
+    folder,
+    name: base,
+    internal: {
+      type: 'KbfsFile',
+      mediaType: res.headers.get('content-type'),
+      contentDigest: makeContentDigest(content),
+    },
+  }
+}
 
 export const sourceNodes = async ({actions, store, cache}, pluginOptions, done) => {
   delete pluginOptions.plugins

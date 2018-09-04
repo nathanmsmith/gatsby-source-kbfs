@@ -6,8 +6,12 @@
 
 node_modules/
 
-# dotenv environment variables file
 .env
+.babelrc
+.eslintignore
+.eslintrc
+.nvmrc
+.prettierrc
 
 # Logs
 logs

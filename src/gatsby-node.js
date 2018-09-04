@@ -2,14 +2,11 @@ import url from 'url'
 import path from 'path'
 import crypto from 'crypto'
 import fetch from 'node-fetch'
-import {includes, map, kebabCase} from 'lodash'
+import {map, kebabCase} from 'lodash'
 import {createRemoteFileNode} from 'gatsby-source-filesystem'
 
 import validatePluginOptions from './validate-options.js'
 import getFiles from './get-files.js'
-
-const mimeImages = ['image/png', 'image/jpeg', 'image/webp']
-const isImage = res => includes(mimeImages, res.headers.get('content-type'))
 
 const makeContentDigest = data =>
   crypto
@@ -17,21 +14,21 @@ const makeContentDigest = data =>
     .update(data)
     .digest('hex')
 
-const makeRemoteFileNode = async ({file, store, cache, createNode}) => {
+const makeRemoteFileNode = async ({fileUrl, store, cache, createNode}) => {
   try {
     return await createRemoteFileNode({
-      url: file,
+      url: fileUrl,
       store,
       cache,
       createNode,
     })
   } catch (error) {
-    console.error(`Failed to download and create node for ${file}`)
+    console.error(`Failed to download and create node for ${fileUrl}`)
   }
 }
 
-const makeKBFSFile = ({res, fileNode, username, folder, file, content}) => {
-  const {pathname} = url.parse(file)
+const makeKBFSFile = ({res, fileNode, username, folder, fileUrl, content}) => {
+  const {pathname} = url.parse(fileUrl)
   const {base} = path.parse(pathname)
   const folderKebab = kebabCase(pathname)
   return {
@@ -39,6 +36,8 @@ const makeKBFSFile = ({res, fileNode, username, folder, file, content}) => {
     children: [],
     parent: fileNode.id,
     absolutePath: fileNode.absolutePath,
+    kbfsLink: fileUrl,
+    path: pathname,
     folder,
     name: base,
     internal: {
@@ -62,14 +61,14 @@ export const sourceNodes = async ({actions, store, cache}, pluginOptions, done) 
       const files = await getFiles(username, folder)
       // Wait to resolve all files
       return Promise.all(
-        map(files, async file => {
-          const resFile = await fetch(file)
+        map(files, async fileUrl => {
+          const resFile = await fetch(fileUrl)
           const content = await resFile.text()
           const args = {
             res: resFile,
             username,
             folder,
-            file,
+            fileUrl,
             content,
             store,
             cache,

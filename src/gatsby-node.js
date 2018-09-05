@@ -51,7 +51,13 @@ const makeKBFSFile = ({res, fileNode, username, folder, fileUrl, content}) => {
 export const sourceNodes = async ({actions, store, cache}, pluginOptions, done) => {
   delete pluginOptions.plugins
   // Will throw if options are invalid (user or folder do not exist)
+  try {
   await validatePluginOptions(pluginOptions)
+  } catch (error) {
+    console.error(`\n ${error.message}`)
+    done()
+    return
+  }
   const {username, folders} = pluginOptions
   const {createNode} = actions
 

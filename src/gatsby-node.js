@@ -3,10 +3,13 @@ import path from 'path'
 import crypto from 'crypto'
 import fetch from 'node-fetch'
 import {map, kebabCase} from 'lodash'
-import {createRemoteFileNode} from 'gatsby-source-filesystem'
 
 import validatePluginOptions from './validate-options.js'
 import getFiles from './get-files.js'
+import downloadImage from './download-file.js'
+
+const mimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+const isImage = type => mimeTypes.includes(type)
 
 const makeContentDigest = data =>
   crypto
@@ -14,35 +17,23 @@ const makeContentDigest = data =>
     .update(data)
     .digest('hex')
 
-const makeRemoteFileNode = async ({fileUrl, store, cache, createNode}) => {
-  try {
-    return await createRemoteFileNode({
-      url: fileUrl,
-      store,
-      cache,
-      createNode,
-    })
-  } catch (error) {
-    console.error(`Failed to download and create node for ${fileUrl}`)
-  }
-}
-
 const makeKBFSFile = ({res, fileNode, username, folder, fileUrl, content}) => {
   const {pathname} = url.parse(fileUrl)
   const {base} = path.parse(pathname)
   const folderKebab = kebabCase(pathname)
+  const contentType = res.headers.get('content-type')
+  const lastModified = res.headers.get('last-modified')
   return {
     id: `kbfs-${username}-${folderKebab}`,
     children: [],
-    parent: fileNode.id,
-    absolutePath: fileNode.absolutePath,
     kbfsLink: fileUrl,
     path: pathname,
     folder,
     name: base,
+    lastModified,
     internal: {
       type: 'KbfsFile',
-      mediaType: res.headers.get('content-type'),
+      mediaType: contentType,
       contentDigest: makeContentDigest(content),
     },
   }
@@ -52,14 +43,14 @@ export const sourceNodes = async ({actions, store, cache}, pluginOptions, done) 
   delete pluginOptions.plugins
   // Will throw if options are invalid (user or folder do not exist)
   try {
-  await validatePluginOptions(pluginOptions)
+    await validatePluginOptions(pluginOptions)
   } catch (error) {
     console.error(`\n ${error.message}`)
     done()
     return
   }
   const {username, folders} = pluginOptions
-  const {createNode} = actions
+  const {createNode, touchNode} = actions
 
   // Wait to resolve all folders
   await Promise.all(
@@ -81,14 +72,11 @@ export const sourceNodes = async ({actions, store, cache}, pluginOptions, done) 
             createNode,
           }
 
-          const fileNode = await makeRemoteFileNode(args)
-          if (!fileNode) return
-          const imageNode = makeKBFSFile({
-            ...args,
-            fileNode,
-          })
-          imageNode.localFile___NODE = fileNode.id
-          createNode(imageNode)
+          let kbfsNode = makeKBFSFile(args)
+          if (isImage(kbfsNode.internal.mediaType)) {
+            kbfsNode = await downloadImage(fileUrl, kbfsNode, {store, cache, createNode, touchNode})
+          }
+          createNode(kbfsNode)
         })
       )
     })

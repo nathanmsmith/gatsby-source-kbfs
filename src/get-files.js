@@ -14,6 +14,8 @@ export const makeKBFSRawUrl = (username, folder) => new URL(folder, `https://${u
  * Loads the HTML contents of `https://keybase.pub/{username}/{path}` and builds new
  * file paths to the raw files at `https://{username}.keybase.pub/{path}/{file}`
  *
+ * At the moment, keybase.pub does not have a JSON API (coming soon perhaps).
+ *
  * @param {String} username Keybase username
  * @param {String} folder Directory path relative to user's public KBFS directory
  * @returns {String[]}  Array of KBFS URLS to the raw file contents

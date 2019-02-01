@@ -52,10 +52,12 @@ export const sourceNodes = async ({actions, store, cache}, pluginOptions, done) 
   const {username, folders} = pluginOptions
   const {createNode, touchNode} = actions
 
+  console.log('KBFS', {folders})
   // Wait to resolve all folders
   await Promise.all(
     map(folders, async folder => {
       const files = await getFiles(username, folder)
+      console.log('KBFS', {files})
       // Wait to resolve all files
       return Promise.all(
         map(files, async fileUrl => {

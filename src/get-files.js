@@ -34,6 +34,7 @@ const getFiles = async (username, folder) => {
     .map(fileName => makeKBFSRawUrl(username, path.join(folder, fileName)))
     .value()
 
+  console.log('KBFS', filePaths)
   return filePaths
 }
 

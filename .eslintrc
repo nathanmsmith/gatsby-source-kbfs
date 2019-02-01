@@ -30,6 +30,7 @@
         "indent": "off",
         "no-duplicate-imports": "off",
         "no-mixed-operators": "off",
+        "object-curly-spacing": ["error", "never"],
         "space-before-function-paren": "off",
         "standard/array-bracket-even-spacing": "off",
         "standard/computed-property-even-spacing": ["error", "never"],

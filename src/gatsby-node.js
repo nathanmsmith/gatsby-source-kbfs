@@ -18,8 +18,8 @@ const makeContentDigest = data =>
     .digest('hex')
 
 const makeKBFSFile = ({res, fileNode, username, folder, fileUrl, content}) => {
-  const {pathname} = url.parse(fileUrl)
-  const {base} = path.parse(pathname)
+  const {pathname} = new URL(fileUrl)
+  const {name} = path.parse(pathname)
   const folderKebab = kebabCase(pathname)
   const contentType = res.headers.get('content-type')
   const lastModified = res.headers.get('last-modified')
@@ -28,18 +28,18 @@ const makeKBFSFile = ({res, fileNode, username, folder, fileUrl, content}) => {
     children: [],
     kbfsLink: fileUrl,
     path: pathname,
-    folder,
-    name: base,
+    name: name,
+    folder: folder,
     lastModified,
     internal: {
-      type: 'KbfsFile',
+      type: 'KBFSFile',
       mediaType: contentType,
       contentDigest: makeContentDigest(content),
     },
   }
 }
 
-export const sourceNodes = async ({actions, store, cache}, pluginOptions, done) => {
+export const sourceNodes = async ({actions, createNodeId, store, cache}, pluginOptions, done) => {
   delete pluginOptions.plugins
   // Will throw if options are invalid (user or folder do not exist)
   try {
@@ -52,12 +52,10 @@ export const sourceNodes = async ({actions, store, cache}, pluginOptions, done) 
   const {username, folders} = pluginOptions
   const {createNode, touchNode} = actions
 
-  console.log('KBFS', {folders})
   // Wait to resolve all folders
   await Promise.all(
     map(folders, async folder => {
       const files = await getFiles(username, folder)
-      console.log('KBFS', {files})
       // Wait to resolve all files
       return Promise.all(
         map(files, async fileUrl => {
@@ -76,7 +74,13 @@ export const sourceNodes = async ({actions, store, cache}, pluginOptions, done) 
 
           let kbfsNode = makeKBFSFile(args)
           if (isImage(kbfsNode.internal.mediaType)) {
-            kbfsNode = await downloadImage(fileUrl, kbfsNode, {store, cache, createNode, touchNode})
+            kbfsNode = await downloadImage(fileUrl, kbfsNode, {
+              store,
+              cache,
+              createNode,
+              createNodeId,
+              touchNode,
+            })
           }
           createNode(kbfsNode)
         })
